@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="boardMapper">
+
+  <!-- 게시판만들기 -->
+  
+  <insert id="write" parameterType="kr.com.web.board.BoardVO"> 
+        Insert into board
+        (Title , Content , Writer)
+  values(#{title} , #{content} , #{writer} );
+  </insert>
+  
+  <!-- 게시판목록 -->
+  
+  <select id="listPage" parameterType="kr.com.web.Criteria" resultType="kr.com.web.board.BoardVO">
+     Select Bno , Title , Content, Writer
+     from (select Bno,Title,Content,Writer,
+      ROW_NUMBER() OVER(ORDER BY Bno DESC) AS RNUM
+		         FROM board ) sh
+     where RNUM between #{rowStart} and #{rowEnd}
+     ORDER BY Bno DESC
+  </select>
+  
+  <!-- 게시물 총 갯수 -->
+  
+  <select id="listCount" resultType="int">
+  <![CDATA[
+	 SELECT COUNT(Bno)
+	  FROM Board
+	  WHERE Bno > 0
+  ]]>
+  </select>
+  
+  <!-- 게시판 상세조회 -->
+  
+  <select id="read" parameterType="int" resultType="kr.com.web.board.BoardVO">
+	 Select Bno , Title , Content , Writer
+     from board
+	 WHERE Bno = #{bno}
+  </select>
+  
+  <!-- 게시물 수정 -->
+  
+  <update id="update">
+     Update board set
+	 Title = #{title},
+	 Content = #{content}
+	 where Bno = #{bno}
+  </update>
+  
+  <!-- 게시물삭제 -->
+
+  <delete id="delete">
+     delete from board 
+     where Bno= #{bno};
+  </delete>
+  
+  <!-- 좋아요  -->
+  
+  <update id="likeupdate">
+    update board set
+    Blike = #{blike}
+    where Bno = #{bno}
+  </update>
+  
+</mapper>
